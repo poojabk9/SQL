@@ -13,6 +13,7 @@ FROM COVID..CovidVaccinations
 
 --Looking at Total cases vs Total deaths by location
 --Shows the likelihood of you dying if you contract covid in your country
+
 SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS DeathPercentage
 FROM CovidDeaths
 WHERE location ='India'
@@ -52,12 +53,14 @@ GROUP BY location
 ORDER BY TotalDeathCount DESC
 
 --Global cases vs deaths
+
 SELECT SUM(new_cases) AS TotalCases, SUM(new_deaths) AS TotalDeaths, SUM(new_deaths)/SUM(new_cases)*100 AS DeathPercentage
 FROM CovidDeaths
 WHERE continent IS NOT NULL
 ORDER BY 1,2
 
 --Showing Global cases vs deaths by date
+
 SELECT date, SUM(new_cases) AS TotalCases, SUM(new_deaths) AS TotalDeaths, SUM(new_deaths)/SUM(new_cases)*100 AS DeathPercentage
 FROM CovidDeaths
 WHERE continent IS NOT NULL
@@ -83,6 +86,7 @@ WHERE dea.continent IS NOT NULL
 ORDER BY 2,3
 
 --Using CTE to get the global vaccinated percentage
+
 WITH VaccVSPopu (continent, location, date, population, new_vaccinations, TotalVaccinated)
 AS
 (
