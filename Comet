@@ -1,0 +1,138 @@
+/*
+    Comet Data set
+
+    Skills: Regular Expression, Functions, Substring, Alter table, CTE, Group By, Order By
+*/
+
+-- Understanding the data
+
+SELECT *
+FROM comet
+
+SELECT COUNT(prefix)
+FROM comet
+WHERE prefix IS NOT NULL
+
+SELECT prefix
+FROM comet
+WHERE prefix IS NOT NULL
+
+SELECT TOP 4 *
+FROM comet
+
+SELECT COUNT(spkid)
+FROM comet
+
+SELECT DISTINCT(full_name)
+FROM comet
+
+-- Removing data that are not relevent
+
+ALTER TABLE comet
+DROP COLUMN prefix
+
+SELECT TOP 3 *
+FROM comet
+
+--Checking If first_obs and last_obs are in the right date format
+
+SELECT first_obs
+FROM comet
+WHERE first_obs NOT LIKE '[1-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+
+SELECT last_obs
+FROM comet
+WHERE last_obs NOT LIKE '[1-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+
+--1439 values are not in the right date format So creating a new column that holds just the Year.
+
+-- Creating new colum first_obs_Year with only year deom first_obs
+
+SELECT first_obs,
+    SUBSTRING(first_obs,1,4) AS first_obs_Year 
+FROM comet
+
+ALTER TABLE comet
+ADD first_obs_year AS (SUBSTRING(first_obs,1,4));
+
+-- Creating new colum last_obs_Year with only year deom last_obs
+
+SELECT last_obs,
+    SUBSTRING(last_obs,1,4) AS last_obs_Year 
+FROM comet
+
+ALTER TABLE comet
+ADD last_obs_year AS (SUBSTRING(last_obs,1,4));
+
+--Update the datatype to Date
+
+ALTER TABLE comet
+ALTER COLUMN first_obs DATE
+
+--Comets which is closest to Earth
+
+SELECT full_name, moid
+FROM comet
+WHERE neo = 'Y' AND moid IS NOT NULL
+ORDER BY moid
+
+SELECT neo, COUNT(neo)
+FROM comet
+WHERE neo = 'N'
+GROUP BY neo
+
+SELECT full_name
+FROM comet
+WHERE name IS NULL
+
+SELECT COUNT(spkid)
+FROM comet
+WHERE full_name IS NULL
+
+--Finding the Biggest coment 
+
+SELECT TOP 1 full_name, diameter
+FROM comet
+WHERE diameter IS NOT NULL
+ORDER BY diameter DESC
+
+--Finding the Samllest coment 
+
+SELECT TOP 1 full_name, diameter
+FROM comet
+WHERE diameter IS NOT NULL
+ORDER BY diameter
+
+--Comet that is closest to Earth 
+
+SELECT TOP 1 full_name, moid
+FROM comet
+WHERE moid IS NOT NULL
+ORDER BY moid
+
+--Comet that is far away farm Earth 
+
+SELECT TOP 1 full_name, moid
+FROM comet
+WHERE moid IS NOT NULL
+ORDER BY moid DESC
+
+-- Average diamter of comet, Grouped by number of satellite
+
+SELECT sats, AVG(diameter) AS AverageDiameter
+FROM comet
+WHERE diameter IS NOT NULL
+GROUP BY sats
+
+--Difference in First and Last orbits years
+
+WITH diff_in_orbit_years(first_obs, last_obs, difference_in_years)
+AS
+(
+SELECT first_obs_year, last_obs_year, (CAST(last_obs_year AS INT) - CAST(first_obs_year AS INT)) AS difference_in_years
+FROM comet
+)
+SELECT *
+FROM diff_in_orbit_years
+WHERE difference_in_years < 100
+
